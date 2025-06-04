@@ -1024,6 +1024,32 @@ body[data-theme='dark'] {
         height: 50%;
         background-size: 100% auto;
     }
+
+    /* Make form elements more touch-friendly */
+    input, 
+    select, 
+    textarea, 
+    button {
+        min-height: 44px; /* Minimum touch target size */
+        font-size: 16px; /* Prevent iOS zoom on focus */
+    }
+
+    /* Adjust padding and margins */
+    .section-title {
+        margin-bottom: 1.5rem;
+        font-size: 1.8rem;
+    }
+
+    /* Stack items vertically on mobile */
+    .flex-container {
+        flex-direction: column;
+    }
+
+    /* Ensure images don't overflow */
+    img {
+        max-width: 100%;
+        height: auto;
+    }
 }
 
 @media (min-width: 2000px) {
@@ -1296,5 +1322,86 @@ body[data-theme='dark'] {
 
     .weather-card {
         margin: 0 1rem 2rem;
+    }
+}
+
+/* Mobile Responsive Styles */
+@media (max-width: 768px) {
+    /* Navigation */
+    .nav-links {
+        display: none; /* We'll add a mobile menu button later */
+    }
+    
+    /* Hero Section */
+    .hero-content {
+        width: 100%;
+        text-align: center;
+        padding: 1rem;
+    }
+    
+    .hero-content h1 {
+        font-size: 2.5rem;
+    }
+    
+    .tagline {
+        font-size: 1.1rem;
+    }
+
+    /* Main content sections */
+    section {
+        padding: 3rem 1rem;
+    }
+
+    /* Map container */
+    iframe {
+        height: 300px;
+    }
+
+    /* Cards and grids */
+    .card-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    .event-card, .team-card {
+        margin: 0 0 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    /* Header */
+    .logo {
+        font-size: 1.2rem;
+    }
+
+    /* Hero Section */
+    .hero-content h1 {
+        font-size: 2rem;
+    }
+
+    /* Make form elements more touch-friendly */
+    input, 
+    select, 
+    textarea, 
+    button {
+        min-height: 44px; /* Minimum touch target size */
+        font-size: 16px; /* Prevent iOS zoom on focus */
+    }
+
+    /* Adjust padding and margins */
+    .section-title {
+        margin-bottom: 1.5rem;
+        font-size: 1.8rem;
+    }
+
+    /* Stack items vertically on mobile */
+    .flex-container {
+        flex-direction: column;
+    }
+
+    /* Ensure images don't overflow */
+    img {
+        max-width: 100%;
+        height: auto;
     }
 }
