@@ -1,3 +1,35 @@
+// Configuration
+const config = {
+    basePath: '/',
+    paths: {
+        home: '/',
+        events: '/pages/events.html',
+        map: '/pages/map.html',
+        community: '/pages/community.html'
+    }
+};
+
+// Update navigation active states
+function updateActiveNav() {
+    const currentPath = window.location.pathname;
+    document.querySelectorAll('.nav-links a').forEach(link => {
+        const linkPath = link.getAttribute('href');
+        if (currentPath === linkPath) {
+            link.classList.add('active');
+            link.setAttribute('aria-current', 'page');
+        } else {
+            link.classList.remove('active');
+            link.removeAttribute('aria-current');
+        }
+    });
+}
+
+// Initialize navigation
+function initializeNavigation() {
+    updateActiveNav();
+    window.addEventListener('popstate', updateActiveNav);
+}
+
 // Register Service Worker
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
@@ -24,6 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initializeFormsIfPresent();
     appearanceManager.init(); // Initialize appearance manager
     authManager.init(); // Initialize authentication manager
+    initializeNavigation();
 }, { passive: true });
 
 // Mobile menu functionality with improved accessibility

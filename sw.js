@@ -5,7 +5,10 @@ const ASSETS_TO_CACHE = [
   '/css/styles.css',
   '/js/app.js',
   '/manifest.json',
-  'https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap'
+  '/pages/events.html',
+  '/pages/map.html',
+  '/pages/community.html',
+  'https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Nunito:wght@400;600;700&display=swap'
 ];
 
 // Install Service Worker

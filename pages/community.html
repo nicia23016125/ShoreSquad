@@ -13,26 +13,25 @@
 </head>
 <body>
     <header>
-        <nav>            <div class="logo">
-                <a href="/ShoreSquad/">
+        <nav>
+            <div class="logo">
+                <a href="/" aria-label="ShoreSquad Home">
                     <span class="icon">🐋</span>
                     <span>ShoreSquad</span>
                     <span class="icon-accent">🌊</span>
                 </a>
             </div>
-            <button class="mobile-menu" aria-label="Toggle menu">
+            <button class="mobile-menu" aria-label="Toggle menu" aria-expanded="false" aria-controls="nav-links">
                 <span></span>
                 <span></span>
                 <span></span>
             </button>
-            <div class="nav-links">
-                <a href="/ShoreSquad/pages/events.html">Cleanup Events</a>
-                <a href="map.html">Map</a>
-                <a href="community.html" class="highlight active">Join Squad</a>
+            <div class="nav-links" id="nav-links">
+                <a href="/">Home</a>
+                <a href="/pages/events.html">Events</a>
+                <a href="/pages/map.html">Map</a>
+                <a href="/pages/community.html" class="highlight active" aria-current="page">Join Squad</a>
             </div>
-            <button class="mobile-menu" aria-label="Toggle menu">
-                <span></span><span></span><span></span>
-            </button>
         </nav>
     </header>
 

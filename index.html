@@ -1,39 +1,34 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="HandheldFriendly" content="true">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="theme-color" content="#00A9A5">
-    <meta name="format-detection" content="telephone=no">
+<head>
+    <meta charset="UTF-8">    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ShoreSquad - Rally Your Beach Cleanup Crew!</title>
-    <meta name="description" content="Join ShoreSquad to organize beach cleanups, track weather, and connect with eco-minded people"><link rel="manifest" href="/ShoreSquad/manifest.json">
+    <meta name="description" content="Join ShoreSquad to organize beach cleanups, track weather, and connect with eco-minded people">
+    <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#00A9A5">
-    <link rel="apple-touch-icon" href="/ShoreSquad/images/icon-192.png">
-    <link rel="stylesheet" href="/ShoreSquad/css/styles.css?v=1.0.0">
+    <link rel="apple-touch-icon" href="images/icon-192.png">    <link rel="stylesheet" href="css/styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
-    <script src="/ShoreSquad/js/app.js?v=1.0.0" defer></script>
-    <!-- Prevent caching of CSS and JS files -->
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
+    <script src="js/app.js" defer></script>
 </head>
-<body>    <header>
-        <nav>
+<body>
+    <header>        <nav>
             <div class="logo">
-                <span class="icon">🐋</span>
-                <span>ShoreSquad</span>
-                <span class="icon-accent">🌊</span>
+                <a href="/" aria-label="ShoreSquad Home">
+                    <span class="icon">🐋</span>
+                    <span>ShoreSquad</span>
+                    <span class="icon-accent">🌊</span>
+                </a>
             </div>
-            <button class="mobile-menu" aria-label="Toggle menu">
+            <button class="mobile-menu" aria-label="Toggle menu" aria-expanded="false" aria-controls="nav-links">
                 <span></span>
                 <span></span>
                 <span></span>
-            </button>            <div class="nav-links">
-                <a href="/ShoreSquad/pages/events.html">Cleanup Events</a>
-                <a href="/ShoreSquad/pages/map.html">Map</a>
-                <a href="/ShoreSquad/pages/community.html" class="highlight">Join Squad</a>
+            </button>
+            <div class="nav-links" id="nav-links">
+                <a href="/" class="active" aria-current="page">Home</a>
+                <a href="/pages/events.html">Events</a>
+                <a href="/pages/map.html">Map</a>
+                <a href="/pages/community.html" class="highlight">Join Squad</a>
             </div>
         </nav>
     </header>
@@ -79,28 +74,6 @@
                 <div id="weather-forecast" class="forecast-container">
                     <div class="weather-loading">Loading forecast...</div>
                 </div>
-            </div>
-        </section>
-
-        <section id="next-cleanup">
-            <h2>Next Cleanup Location</h2>            <div class="map-container">
-                <iframe
-                    width="100%"
-                    height="450"
-                    style="border:0;border-radius:var(--radius-md);box-shadow:0 8px 30px var(--shadow);"
-                    loading="lazy"
-                    allowfullscreen
-                    referrerpolicy="no-referrer-when-downgrade"                    src="https://www.google.com/maps/embed/v1/view?key=AIzaSyC7AFCmzz0SaG8CYILGPgcvxYuNZNsh1LE
-                        &center=1.381497,103.955574
-                        &zoom=15
-                        &maptype=roadmap
-                        &markers=color:blue|label:Next Cleanup|1.381497,103.955574">
-                </iframe>
-            </div>
-            <div class="cleanup-info">
-                <p><strong>Next Cleanup:</strong> Pasir Ris Beach</p>
-                <p><strong>Meeting Point:</strong> Street View Asia</p>
-                <p><strong>GPS:</strong> 1.381497, 103.955574</p>
             </div>
         </section>
 
