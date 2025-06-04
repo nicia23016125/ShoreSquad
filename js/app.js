@@ -381,70 +381,151 @@ function showFormMessage(form, message, type) {
     }, 5000);
 }
 
-// Weather Module with OpenWeatherMap integration
+// Weather Module with data.gov.sg API integration
 const weatherModule = {
-    apiKey: 'YOUR_OPENWEATHERMAP_API_KEY', // Replace with your API key
     weatherResult: document.getElementById('weather-result'),
+    forecastContainer: document.getElementById('weather-forecast'),
     retryButton: document.getElementById('retry-weather'),
+    refreshInterval: null,
+    cache: {
+        current: { data: null, timestamp: 0 },
+        forecast: { data: null, timestamp: 0 }
+    },
+    CACHE_DURATION: 5 * 60 * 1000, // 5 minutes
 
     async init() {
         this.setupRetryButton();
-        await this.getCurrentWeather();
-        await this.getForecast();
+        await this.refreshWeather();
+        
+        // Setup auto refresh every 5 minutes
+        this.refreshInterval = setInterval(() => this.refreshWeather(), 5 * 60 * 1000);
     },
 
     setupRetryButton() {
         if (this.retryButton) {
             this.retryButton.addEventListener('click', async () => {
                 this.retryButton.style.display = 'none';
-                await this.getCurrentWeather();
+                await this.refreshWeather();
             });
         }
     },
 
-    async getCurrentPosition() {
-        return new Promise((resolve, reject) => {
-            if (!navigator.geolocation) {
-                reject(new Error('Geolocation is not supported by your browser'));
-                return;
-            }
-
-            navigator.geolocation.getCurrentPosition(
-                position => resolve(position),
-                error => reject(error),
-                { enableHighAccuracy: true }
-            );
-        });
+    async refreshWeather() {
+        try {
+            await Promise.all([
+                this.getCurrentWeather(),
+                this.get4DayForecast()
+            ]);
+        } catch (error) {
+            console.error('Error refreshing weather:', error);
+        }
     },
 
     async getCurrentWeather() {
         try {
-            const position = await this.getCurrentPosition();
-            const { latitude, longitude } = position.coords;
-            
-            const response = await fetch(
-                `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${this.apiKey}&units=metric`
-            );
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+            // Check cache first
+            if (this.isCacheValid('current')) {
+                const { temp, condition } = this.cache.current.data;
+                this.displayCurrentWeather(temp, condition);
+                return;
             }
 
-            const data = await response.json();
-            this.displayCurrentWeather(data);
+            const tempResponse = await fetch('https://api.data.gov.sg/v1/environment/air-temperature');
+            const weatherResponse = await fetch('https://api.data.gov.sg/v1/environment/2-hour-weather-forecast');
+            
+            if (!tempResponse.ok || !weatherResponse.ok) {
+                throw new Error('Error fetching weather data');
+            }
+
+            const tempData = await tempResponse.json();
+            const weatherData = await weatherResponse.json();
+            
+            // Get the most recent readings
+            const latestReading = tempData.items[0].readings[0];
+            const temp = Math.round(latestReading.value);
+            
+            const weatherForecast = weatherData.items[0].forecasts.find(f => f.area === "Changi");
+            const condition = weatherForecast ? weatherForecast.forecast.toLowerCase() : 'unavailable';
+
+            // Cache the data
+            this.cache.current = {
+                data: { temp, condition },
+                timestamp: Date.now()
+            };
+
+            this.displayCurrentWeather(temp, condition);
         } catch (error) {
-            console.error('Error fetching weather:', error);
+            console.error('Error fetching current weather:', error);
             this.handleError(error);
         }
     },
 
-    displayCurrentWeather(data) {
+    async get4DayForecast() {
+        try {
+            // Check cache first
+            if (this.isCacheValid('forecast')) {
+                this.displayForecast(this.cache.forecast.data);
+                return;
+            }
+
+            const response = await fetch('https://api.data.gov.sg/v1/environment/4-day-weather-forecast');
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            const data = await response.json();
+            const forecasts = data.items[0].forecasts;
+
+            // Cache the data
+            this.cache.forecast = {
+                data: forecasts,
+                timestamp: Date.now()
+            };
+            
+            this.displayForecast(forecasts);
+        } catch (error) {
+            console.error('Error fetching forecast:', error);
+            this.handleForecastError();
+        }
+    },
+
+    displayForecast(forecasts) {
+        if (!this.forecastContainer) return;
+
+        let forecastHTML = '<div class="forecast-grid">';
+        
+        forecasts.forEach(forecast => {
+            const date = new Date(forecast.date);
+            const formattedDate = date.toLocaleDateString('en-US', { 
+                weekday: 'short', 
+                month: 'short', 
+                day: 'numeric' 
+            });
+            
+            forecastHTML += `
+                <div class="forecast-card">
+                    <div class="forecast-date">${formattedDate}</div>
+                    <div class="forecast-icon">${this.getWeatherIcon(forecast.forecast.toLowerCase())}</div>
+                    <div class="forecast-temp">
+                        <span class="high">${forecast.temperature.high}°C</span>
+                        <span class="low">${forecast.temperature.low}°C</span>
+                    </div>
+                    <div class="forecast-desc">${forecast.forecast}</div>
+                    <div class="forecast-humidity">
+                        <span>Humidity: ${forecast.relative_humidity.low}%-${forecast.relative_humidity.high}%</span>
+                    </div>
+                </div>
+            `;
+        });
+        
+        forecastHTML += '</div>';
+        this.forecastContainer.innerHTML = forecastHTML;
+    },
+
+    displayCurrentWeather(temp, condition) {
         if (!this.weatherResult) return;
 
-        const temp = Math.round(data.main.temp);
-        const condition = data.weather[0].main.toLowerCase();
         const icon = this.getWeatherIcon(condition);
-
         this.weatherResult.innerHTML = `
             <div class="weather-icon">${icon}</div>
             <div class="weather-text">${temp}°C - ${condition}</div>
@@ -453,17 +534,25 @@ const weatherModule = {
 
     getWeatherIcon(condition) {
         const icons = {
-            'clear': '☀️',
-            'clouds': '☁️',
-            'rain': '🌧️',
-            'drizzle': '🌦️',
-            'thunderstorm': '⛈️',
-            'snow': '❄️',
+            'fair': '☀️',
+            'fair (day)': '☀️',
+            'fair (night)': '🌙',
+            'partly cloudy': '⛅',
+            'cloudy': '☁️',
+            'overcast': '☁️',
+            'light rain': '🌦️',
+            'moderate rain': '🌧️',
+            'heavy rain': '⛈️',
+            'passing showers': '🌦️',
+            'light showers': '🌦️',
+            'showers': '🌧️',
+            'heavy showers': '⛈️',
+            'thundery showers': '⛈️',
+            'windy': '💨',
             'mist': '🌫️',
-            'fog': '🌫️',
-            'haze': '🌫️'
+            'hazy': '😶‍🌫️'
         };
-        return icons[condition] || '🌤️';
+        return icons[condition.toLowerCase()] || '🌤️';
     },
 
     handleError(error) {
@@ -480,23 +569,268 @@ const weatherModule = {
         }
     },
 
-    async getForecast() {
-        // Existing forecast functionality
-        // ...existing forecast code...
+    handleForecastError() {
+        if (this.forecastContainer) {
+            this.forecastContainer.innerHTML = `
+                <div class="weather-error">
+                    <p>Unable to load forecast data</p>
+                    <button id="retry-forecast" class="retry-btn button-3d">Try Again</button>
+                </div>
+            `;
+
+            // Setup retry button for forecast
+            const retryForecast = document.getElementById('retry-forecast');
+            if (retryForecast) {
+                retryForecast.addEventListener('click', async () => {
+                    this.forecastContainer.innerHTML = '<div class="weather-loading">Loading forecast...</div>';
+                    await this.get4DayForecast();
+                });
+            }
+        }
+    },
+
+    isCacheValid(type) {
+        const cache = this.cache[type];
+        return cache.data && (Date.now() - cache.timestamp < this.CACHE_DURATION);
+    },
+
+    // Cleanup method to clear interval when needed
+    destroy() {
+        if (this.refreshInterval) {
+            clearInterval(this.refreshInterval);
+            this.refreshInterval = null;
+        }
     }
 };
 
-// Initialize weather module when DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
-    // ...existing initialization code...
-    weatherModule.init(); // Initialize weather module
-}, { passive: true });
-
-// Placeholder for maps integration
+// Maps Integration
 const mapsModule = {
+    map: null,
+    markers: [],
+    infoWindow: null,
+
     init: async function() {
-        // Will be implemented with actual maps API
-        console.log('Maps module ready for integration');
+        const mapContainer = document.getElementById('map');
+        if (!mapContainer) return;
+
+        // Initialize info window
+        this.infoWindow = new google.maps.InfoWindow();
+
+        // Initialize map centered on Singapore
+        this.map = new google.maps.Map(mapContainer, {
+            center: { lat: 1.3521, lng: 103.8198 },
+            zoom: 12,
+            mapTypeId: google.maps.MapTypeId.ROADMAP,
+            mapTypeControl: true,
+            mapTypeControlOptions: {
+                style: google.maps.MapTypeControlStyle.HORIZONTAL_BAR,
+                position: google.maps.ControlPosition.TOP_RIGHT
+            },
+            zoomControl: true,
+            zoomControlOptions: {
+                position: google.maps.ControlPosition.RIGHT_CENTER
+            },
+            streetViewControl: true,
+            streetViewControlOptions: {
+                position: google.maps.ControlPosition.RIGHT_CENTER
+            },
+            fullscreenControl: true,
+            styles: [
+                {
+                    featureType: "water",
+                    elementType: "geometry",
+                    stylers: [
+                        { color: "#AEE6F9" }
+                    ]
+                }
+            ]
+        });
+
+        // Add sample cleanup events
+        this.addCleanupEvents();
+        
+        // Setup event listeners
+        this.setupEventListeners();
+    },
+
+    addCleanupEvents: function() {
+        const events = [
+            {
+                position: { lat: 1.381497, lng: 103.955574 },
+                title: "Pasir Ris Beach Cleanup",
+                date: "June 15, 2025",
+                description: "Join us for a morning of beach cleaning and environmental education."
+            },
+            {
+                position: { lat: 1.298350, lng: 103.859770 },
+                title: "East Coast Park Cleanup",
+                date: "June 22, 2025",
+                description: "Monthly cleanup event at East Coast Park. All equipment provided!"
+            }
+        ];
+
+        events.forEach(event => {
+            const marker = new google.maps.Marker({
+                position: event.position,
+                map: this.map,
+                title: event.title,
+                icon: {
+                    path: google.maps.SymbolPath.CIRCLE,
+                    scale: 10,
+                    fillColor: "#00A9A5",
+                    fillOpacity: 0.9,
+                    strokeWeight: 2,
+                    strokeColor: "#FFFFFF"
+                },
+                animation: google.maps.Animation.DROP
+            });
+
+            marker.addListener('click', () => {
+                this.infoWindow.setContent(`
+                    <div class="map-info-window">
+                        <h3>${event.title}</h3>
+                        <p><strong>Date:</strong> ${event.date}</p>
+                        <p>${event.description}</p>
+                        <button onclick="mapsModule.registerForEvent('${event.title}')" class="feature-btn">Register</button>
+                    </div>
+                `);
+                this.infoWindow.open(this.map, marker);
+            });
+
+            this.markers.push(marker);
+        });
+    },
+
+    setupEventListeners: function() {
+        const addEventBtn = document.getElementById('add-event');
+        if (addEventBtn) {
+            addEventBtn.addEventListener('click', () => {
+                // Get user's current position for new event
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(
+                        (position) => {
+                            const pos = {
+                                lat: position.coords.latitude,
+                                lng: position.coords.longitude
+                            };
+                            this.map.setCenter(pos);
+                            this.map.setZoom(15);
+                            this.showAddEventForm(pos);
+                        },
+                        () => {
+                            console.error('Error getting current location');
+                            // Show error notification to user
+                            const notification = document.createElement('div');
+                            notification.className = 'notification error';
+                            notification.textContent = 'Unable to get your location. Please try again.';
+                            document.body.appendChild(notification);
+                            setTimeout(() => notification.remove(), 3000);
+                        }
+                    );
+                }
+            });
+        }
+    },
+
+    showAddEventForm: function(position) {
+        this.infoWindow.setContent(`
+            <div class="map-info-window">
+                <h3>Add New Cleanup Event</h3>
+                <form id="add-event-form">
+                    <div class="form-group">
+                        <label for="event-title">Event Title</label>
+                        <input type="text" id="event-title" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="event-date">Date</label>
+                        <input type="date" id="event-date" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="event-description">Description</label>
+                        <textarea id="event-description" required></textarea>
+                    </div>
+                    <button type="submit" class="feature-btn">Create Event</button>
+                </form>
+            </div>
+        `);
+
+        // Add a temporary marker at the clicked location
+        const tempMarker = new google.maps.Marker({
+            position: position,
+            map: this.map,
+            draggable: true,
+            icon: {
+                path: google.maps.SymbolPath.CIRCLE,
+                scale: 10,
+                fillColor: "#FF7E54",
+                fillOpacity: 0.9,
+                strokeWeight: 2,
+                strokeColor: "#FFFFFF"
+            }
+        });
+
+        this.infoWindow.open(this.map, tempMarker);
+
+        // Handle form submission
+        google.maps.event.addListenerOnce(this.infoWindow, 'domready', () => {
+            const form = document.getElementById('add-event-form');
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const title = document.getElementById('event-title').value;
+                const date = document.getElementById('event-date').value;
+                const description = document.getElementById('event-description').value;
+
+                // Create new event marker
+                const marker = new google.maps.Marker({
+                    position: tempMarker.getPosition(),
+                    map: this.map,
+                    title: title,
+                    icon: {
+                        path: google.maps.SymbolPath.CIRCLE,
+                        scale: 10,
+                        fillColor: "#00A9A5",
+                        fillOpacity: 0.9,
+                        strokeWeight: 2,
+                        strokeColor: "#FFFFFF"
+                    },
+                    animation: google.maps.Animation.DROP
+                });
+
+                marker.addListener('click', () => {
+                    this.infoWindow.setContent(`
+                        <div class="map-info-window">
+                            <h3>${title}</h3>
+                            <p><strong>Date:</strong> ${date}</p>
+                            <p>${description}</p>
+                            <button onclick="mapsModule.registerForEvent('${title}')" class="feature-btn">Register</button>
+                        </div>
+                    `);
+                    this.infoWindow.open(this.map, marker);
+                });
+
+                this.markers.push(marker);
+                tempMarker.setMap(null);
+                this.infoWindow.close();
+
+                // Show success notification
+                const notification = document.createElement('div');
+                notification.className = 'notification success';
+                notification.textContent = 'Event created successfully!';
+                document.body.appendChild(notification);
+                setTimeout(() => notification.remove(), 3000);
+            });
+        });
+    },
+
+    registerForEvent: function(eventTitle) {
+        // Here you would typically handle event registration
+        // For now, we'll just show a success message
+        const notification = document.createElement('div');
+        notification.className = 'notification success';
+        notification.textContent = `Successfully registered for ${eventTitle}!`;
+        document.body.appendChild(notification);
+        setTimeout(() => notification.remove(), 3000);
+        this.infoWindow.close();
     }
 };
 
