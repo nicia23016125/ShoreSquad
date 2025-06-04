@@ -66,11 +66,26 @@ body {
     background-color: var(--background);
     min-height: 100vh;
     overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
-h1, h2, h3, h4, h5, h6 {
-    font-family: 'Nunito', sans-serif;
-    font-weight: 700;
+/* Base responsive styles */
+html {
+    font-size: 16px;
+    -webkit-text-size-adjust: 100%;
+}
+
+@media screen and (min-width: 320px) {
+    html {
+        font-size: calc(16px + 2 * ((100vw - 320px) / 880));
+    }
+}
+
+@media screen and (min-width: 1200px) {
+    html {
+        font-size: 18px;
+    }
 }
 
 /* Header and Navigation */
@@ -102,21 +117,24 @@ nav {
 }
 
 .mobile-menu {
-    display: block;
-    background: none;
+    position: relative;
+    z-index: 1000;
     border: none;
-    padding: 0.5rem;
+    background: transparent;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    display: none;
     cursor: pointer;
-    z-index: 2;
 }
 
 .mobile-menu span {
     display: block;
     width: 24px;
     height: 2px;
-    background-color: var(--text);
-    margin: 5px 0;
-    transition: 0.3s var(--bounce);
+    background: var(--text);
+    margin: 5px auto;
+    transition: transform 0.3s var(--bounce), opacity 0.3s ease;
 }
 
 .nav-links {
@@ -142,10 +160,14 @@ nav {
     padding: 0.8rem 1rem;
     text-align: center;
     border-radius: var(--radius-sm);
+    font-size: 1.2rem;
+    padding: 1rem;
+    width: 100%;
+    text-align: center;
 }
 
 /* Active mobile menu button */
-.mobile-menu.active span:nth-child(1) {
+.mobile-menu.active span:first-child {
     transform: translateY(7px) rotate(45deg);
 }
 
@@ -153,7 +175,7 @@ nav {
     opacity: 0;
 }
 
-.mobile-menu.active span:nth-child(3) {
+.mobile-menu.active span:last-child {
     transform: translateY(-7px) rotate(-45deg);
 }
 
@@ -174,11 +196,17 @@ nav {
 .hero-image {
     position: absolute;
     top: 0;
-    left: 0;
-    width: 100%;
+    right: 0;
+    width: 50%;
     height: 100%;
+    background-image: url('https://c4.wallpaperflare.com/wallpaper/800/887/798/anime-doraemon-wallpaper-preview.jpg');
+    background-size: cover;
+    background-position: center;
+    opacity: 0.9;
+    transition: opacity 0.3s ease;
+    z-index: 1;
+    aspect-ratio: 3/4;
     object-fit: cover;
-    z-index: 0;
 }
 
 /* CTA Buttons Container */
@@ -846,10 +874,16 @@ body[data-theme='dark'] {
     }
 }
 
+/* Comprehensive responsive styles */
 @media (max-width: 1200px) {
     .container, nav, .hero-content {
         max-width: 95%;
         padding: 0 2rem;
+    }
+
+    .hero-image {
+        width: 45%;
+        background-position: center;
     }
 }
 
@@ -1031,358 +1065,76 @@ body[data-theme='dark'] {
         max-width: 100%;
         height: auto;
     }
-}
 
-@media (min-width: 2000px) {
-    /* Large Screens */
-    body {
-        font-size: 1.1rem;
+    header {
+        padding: 0.5rem;
     }
 
-    .container, nav, .hero-content {
-        max-width: 1400px;
-    }
-
-    .hero-content h1 {
-        font-size: 4rem;
-    }
-}
-
-/* Touch Device Optimizations */
-@media (hover: none) {
-    .button-3d:hover,
-    .feature-card:hover,
-    .nav-links a:hover {
-        transform: none;
-    }
-
-    .card:hover {
-        transform: none;
-    }
-
-    .button-3d:active,
-    .feature-card:active,
-    .nav-links a:active {
-        transform: scale(0.98);
-    }
-}
-
-/* Dark Mode & High Contrast Support */
-@media (prefers-color-scheme: dark) {
-    :root:not([data-theme]) {
-        --sky-blue: #1E3D59;
-        --sand-beige: #8B7355;
-        --seafoam-green: #2A9D8F;
-        --text: #FFFFFF;
-        --text-light: #CCCCCC;
-        --background: #121212;
-        --white: #1E1E1E;
-        --shadow: rgba(0, 0, 0, 0.3);
-    }
-}
-
-/* Reduced Motion */
-@media (prefers-reduced-motion: reduce) {
-    * {
-        animation: none !important;
-        transition: none !important;
-        transform: none !important;
-    }
-}
-
-.hero-image {
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 50%;
-    height: 100%;
-    background-image: url('https://c4.wallpaperflare.com/wallpaper/800/887/798/anime-doraemon-wallpaper-preview.jpg');
-    background-size: cover;
-    background-position: center;
-    opacity: 0.9;
-    transition: opacity 0.3s ease;
-    z-index: 1;
-    aspect-ratio: 3/4;
-    object-fit: cover;
-}
-
-@media (max-width: 1200px) {
-    .hero-image {
-        width: 45%;
-        background-position: center;
-    }
-}
-
-@media (max-width: 992px) {
-    .hero-image {
-        width: 40%;
-        opacity: 0.7;
-    }
-}
-
-@media (max-width: 768px) {
-    .hero-image {
-        position: fixed;
-        width: 100%;
-        height: 100%;
-        top: 0;
-        bottom: 0;
-        background-position: center;
-        background-size: cover;
-        opacity: 0.4;
-    }
-}
-
-/* Weather Section */
-#weather {
-    padding: 5rem 2rem;
-    background: var(--white);
-}
-
-#weather h2 {
-    text-align: center;
-    margin-bottom: 3rem;
-    color: var(--text);
-}
-
-.weather-container {
-    max-width: 1200px;
-    margin: 0 auto;
-}
-
-.weather-card {
-    background: var(--gradient-primary);
-    border-radius: var(--radius-lg);
-    padding: 2rem;
-    box-shadow: 0 8px 30px var(--shadow);
-    margin-bottom: 2rem;
-    text-align: center;
-}
-
-.current-weather {
-    margin-bottom: 3rem;
-}
-
-.current-weather h3 {
-    color: var(--text);
-    margin-bottom: 1.5rem;
-    font-size: 1.4rem;
-}
-
-.weather-info {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1rem;
-}
-
-.weather-icon {
-    font-size: 3rem;
-    animation: float 3s ease-in-out infinite;
-}
-
-.weather-text {
-    font-size: 1.2rem;
-    color: var(--text);
-    text-transform: capitalize;
-}
-
-.forecast-container {
-    background: var(--white);
-    border-radius: var(--radius-lg);
-    padding: 2rem;
-}
-
-.forecast-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1.5rem;
-}
-
-.forecast-card {
-    background: var(--gradient-primary);
-    padding: 1.5rem;
-    border-radius: var(--radius-md);
-    text-align: center;
-    box-shadow: 0 4px 15px var(--shadow);
-    transition: transform 0.3s var(--bounce);
-}
-
-.forecast-card:hover {
-    transform: translateY(-4px);
-}
-
-.forecast-date {
-    font-weight: 600;
-    margin-bottom: 1rem;
-    color: var(--text);
-}
-
-.forecast-icon {
-    font-size: 2rem;
-    margin: 0.5rem 0;
-    animation: float 3s ease-in-out infinite;
-}
-
-.forecast-temp {
-    margin: 0.5rem 0;
-    display: flex;
-    justify-content: center;
-    gap: 1rem;
-}
-
-.forecast-temp .high {
-    color: var(--text);
-    font-weight: 600;
-}
-
-.forecast-temp .low {
-    color: var(--text-light);
-}
-
-.forecast-desc {
-    margin: 0.5rem 0;
-    color: var(--text);
-    font-size: 0.9rem;
-    text-transform: capitalize;
-}
-
-.forecast-humidity {
-    font-size: 0.85rem;
-    color: var(--text-light);
-}
-
-.weather-loading {
-    text-align: center;
-    padding: 2rem;
-}
-
-.loading-text {
-    color: var(--text);
-    font-size: 1.1rem;
-}
-
-.weather-error {
-    text-align: center;
-    padding: 2rem;
-}
-
-.weather-error p {
-    color: var(--text);
-    margin-bottom: 1rem;
-}
-
-@media (max-width: 768px) {
-    #weather {
-        padding: 3rem 1rem;
-    }
-
-    .weather-card,
-    .forecast-container {
-        padding: 1.5rem;
-    }
-
-    .weather-icon {
-        font-size: 2.5rem;
-    }
-
-    .weather-text {
-        font-size: 1.1rem;
-    }
-
-    .forecast-grid {
-        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-        gap: 1rem;
-    }
-}
-
-@media (max-width: 480px) {
-    .forecast-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .weather-card {
-        margin: 0 1rem 2rem;
-    }
-}
-
-/* Mobile Responsive Styles */
-@media (max-width: 768px) {
-    /* Navigation */
-    .nav-links {
-        display: none; /* We'll add a mobile menu button later */
-    }
-    
-    /* Hero Section */
-    .hero-content {
-        width: 100%;
-        text-align: center;
-        padding: 1rem;
-    }
-    
-    .hero-content h1 {
-        font-size: 2.5rem;
-    }
-    
-    .tagline {
-        font-size: 1.1rem;
-    }
-
-    /* Main content sections */
-    section {
-        padding: 3rem 1rem;
-    }
-
-    /* Map container */
-    iframe {
-        height: 300px;
-    }
-
-    /* Cards and grids */
-    .card-grid {
-        grid-template-columns: 1fr;
-        gap: 1.5rem;
-    }
-
-    .event-card, .team-card {
-        margin: 0 0 1.5rem;
-    }
-}
-
-@media (max-width: 480px) {
-    /* Header */
     .logo {
         font-size: 1.2rem;
     }
 
-    /* Hero Section */
     .hero-content h1 {
-        font-size: 2rem;
-    }
-
-    /* Make form elements more touch-friendly */
-    input, 
-    select, 
-    textarea, 
-    button {
-        min-height: 44px; /* Minimum touch target size */
-        font-size: 16px; /* Prevent iOS zoom on focus */
-    }
-
-    /* Adjust padding and margins */
-    .section-title {
-        margin-bottom: 1.5rem;
         font-size: 1.8rem;
     }
 
-    /* Stack items vertically on mobile */
+    .nav-links {
+        padding-top: 60px;
+    }
+
+    /* Stack items vertically */
     .flex-container {
         flex-direction: column;
     }
 
-    /* Ensure images don't overflow */
+    /* Optimize images */
     img {
         max-width: 100%;
         height: auto;
+    }
+
+    /* Form elements */
+    .form-group {
+        margin-bottom: 1rem;
+    }
+
+    /* Modal adjustments */
+    .modal-content {
+        width: 90%;
+        margin: 2rem auto;
+        padding: 1rem;
+    }
+}
+
+/* High DPI screens */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    body {
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+}
+
+/* PWA optimizations */
+@media all and (display-mode: standalone) {
+    header {
+        padding-top: env(safe-area-inset-top);
+    }
+
+    .nav-links {
+        padding-bottom: env(safe-area-inset-bottom);
+    }
+}
+
+/* Print styles */
+@media print {
+    .mobile-menu,
+    .nav-links,
+    .footer {
+        display: none !important;
+    }
+
+    body {
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact;
     }
 }
