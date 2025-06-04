@@ -6,22 +6,19 @@
     <meta name="description" content="Join ShoreSquad to organize beach cleanups, track weather, and connect with eco-minded people">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#00A9A5">
-    <link rel="apple-touch-icon" href="images/icon-192.png">
-    <link rel="stylesheet" href="css/styles.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="apple-touch-icon" href="images/icon-192.png">    <link rel="stylesheet" href="css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+    <script src="js/app.js" defer></script>
 </head>
 <body>
     <header>
-        <nav>
-            <div class="logo">
-                <span class="icon">🌊</span>
+        <nav>            <div class="logo">
+                <span class="icon">🐋</span>
                 <span>ShoreSquad</span>
-            </div>
-            <div class="nav-links">
-                <a href="#events">Cleanup Events</a>
-                <a href="#weather">Weather</a>
-                <a href="#map">Map</a>
-                <a href="#community" class="highlight">Join Squad</a>
+                <span class="icon-accent">🌊</span>            </div><div class="nav-links">
+                <a href="pages/events.html">Cleanup Events</a>
+                <a href="pages/map.html">Map</a>
+                <a href="pages/community.html" class="highlight">Join Squad</a>
             </div>
             <button class="mobile-menu" aria-label="Toggle menu">
                 <span></span><span></span><span></span>
@@ -30,13 +27,13 @@
     </header>
 
     <main>
-        <section id="hero">
+    <section id="hero">
+            <div class="hero-image"></div>
             <div class="hero-content">
                 <h1>Rally Your Crew for<br>Beach Cleanup!</h1>
-                <p class="tagline">Track weather, find events, and make eco-action fun</p>
-                <div class="cta-buttons">
-                    <button class="cta-primary">Join Next Cleanup</button>
-                    <button class="cta-secondary">Start Your Squad</button>
+                <p class="tagline">Track weather, find events, and make eco-action fun</p>                <div class="cta-buttons">
+                    <button class="cta-primary button-3d" data-action="join">Join Next Cleanup</button>
+                    <button class="cta-secondary button-3d" data-action="start">Start Your Squad</button>
                 </div>
                 <div class="stats">
                     <div class="stat-item">
@@ -53,17 +50,28 @@
                     </div>
                 </div>
             </div>
+        </section>        <section id="weather">
+            <h2>Beach Weather</h2>
+            <div class="weather-container">
+                <div class="weather-card current-weather">
+                    <h3>Current Weather</h3>
+                    <div id="weather-result" class="weather-info">
+                        <div class="weather-loading">
+                            <span class="loading-text">Fetching weather data...</span>
+                            <button id="retry-weather" class="retry-btn button-3d" style="display: none;">
+                                Try Again
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div id="weather-forecast" class="forecast-container">
+                    <div class="weather-loading">Loading forecast...</div>
+                </div>
+            </div>
         </section>
 
         <section id="features">
-            <h2>Squad Tools</h2>
-            <div class="feature-grid">
-                <div class="feature-card">
-                    <div class="icon">🌤️</div>
-                    <h3>Weather Tracker</h3>
-                    <p>Real-time updates for perfect cleanup timing</p>
-                    <button class="feature-btn">Check Weather</button>
-                </div>
+            <h2>Squad Tools</h2>            <div class="feature-grid">
                 <div class="feature-card">
                     <div class="icon">🗺️</div>
                     <h3>Cleanup Map</h3>
@@ -88,7 +96,39 @@
         </section>
     </main>
 
-    <footer>
+    <!-- Registration Modal -->
+    <div class="modal" id="registerModal">
+        <div class="modal-content">
+            <button class="close-modal" aria-label="Close modal">&times;</button>
+            <h2>Join ShoreSquad</h2>
+            <form id="registerForm" class="register-form">
+                <div class="form-group">
+                    <label for="name">Full Name</label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="location">Preferred Beach Location</label>
+                    <input type="text" id="location" name="location" required>
+                </div>
+                <button type="submit" class="cta-primary button-3d">Register Now</button>
+            </form>
+        </div>
+    </div>
+
+    <footer>    <!-- Settings Panel -->
+        <div class="settings-panel">
+            <div class="theme-selection">
+                <select class="theme-selector" aria-label="Select Theme">
+                    <option value="default">🌞 Light</option>
+                    <option value="high-contrast">🔍 High Contrast</option>
+                    <option value="dark">🌙 Dark</option>
+                </select>
+            </div>
+        </div>
         <div class="footer-content">
             <div class="footer-section">
                 <h4>Join the Movement</h4>

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cleanup Map - ShoreSquad</title>    <link rel="stylesheet" href="../css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+    <script src="../js/app.js" defer></script>
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">
+                <a href="../index.html">
+                    <span class="icon">🐋</span>
+                    <span>ShoreSquad</span>
+                    <span class="icon-accent">🌊</span>
+                </a>
+            </div>
+            <div class="nav-links">
+                <a href="events.html">Cleanup Events</a>
+                <a href="map.html" class="active">Map</a>
+                <a href="community.html" class="highlight">Join Squad</a>
+            </div>
+            <button class="mobile-menu" aria-label="Toggle menu">
+                <span></span><span></span><span></span>
+            </button>
+        </nav>
+    </header>
+
+    <main>
+        <section id="map-section">
+            <h1>Beach Cleanup Locations</h1>
+            <div id="map-container">
+                <div id="map" style="height: 600px;"></div>
+                <div class="map-controls">
+                    <button class="cta-primary button-3d" id="add-event">Add New Event</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="../js/app.js"></script>
+</body>
+</html>
